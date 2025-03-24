@@ -1,8 +1,8 @@
-defmodule NervesSystemRpi4.MixProject do
+defmodule NervesSystemRecomputerR11xx.MixProject do
   use Mix.Project
 
-  @github_organization "nerves-project"
-  @app :nerves_system_rpi4
+  @github_organization "alde103"
+  @app :nerves_system_recomputer_r11xx
   @source_url "https://github.com/#{@github_organization}/#{@app}"
   @version Path.join(__DIR__, "VERSION")
            |> File.read!()

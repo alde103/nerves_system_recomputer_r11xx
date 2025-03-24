@@ -1,0 +1,5 @@
+menuconfig BR2_PACKAGE_RECOMPUTER_R110X
+	bool "recomputer-r110x"
+	select BR2_PACKAGE_HOST_DTC
+	help
+	  reComputer-R110x DTS files that may be useful on Nerves systems.
