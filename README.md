@@ -1,36 +1,64 @@
-# Raspberry Pi 4 Model B (64-bit)
+# Nerves System for reComputer R11xx (64-bit)
 
 [![CircleCI](https://circleci.com/gh/nerves-project/nerves_system_rpi4.svg?style=svg)](https://circleci.com/gh/nerves-project/nerves_system_rpi4)
 [![Hex version](https://img.shields.io/hexpm/v/nerves_system_rpi4.svg "Hex version")](https://hex.pm/packages/nerves_system_rpi4)
 
-This is the base Nerves System configuration for the Raspberry Pi 4 Model B.
+This is the base Nerves System configuration for the reComputer R11xx, a versatile edge IoT gateway with AI capabilities powered by the Raspberry Pi CM4.
 
-![Raspberry Pi 4 image](assets/images/raspberry-pi-4-model-b.jpg)
-<br><sup>[Michael Henzler / Wikimedia Commons / CC BY-SA
-4.0](https://en.wikipedia.org/wiki/File:Raspberry_Pi_4_Model_B_-_Top.jpg)</sup>
+![Raspberry Pi 4 image](assets/images/recomputer-r11xx.jpg)
+<br><sup>[Seeed Studio / reComputer R11xx base ](https://www.seeedstudio.com/reComputer-R1113-10-p-6258.html)</sup>
 
-| Feature              | Description                      |
-| -------------------- | -------------------------------- |
-| CPU                  | 1.5 GHz quad-core Cortex-A72 (64-bit mode) |
-| Memory               | 1 GB, 2 GB, 4 GB DRAM            |
-| Storage              | MicroSD                          |
-| Linux kernel         | 6.1 w/ Raspberry Pi patches      |
-| IEx terminal         | HDMI and USB keyboard (can be changed to UART) |
-| GPIO, I2C, SPI       | Yes - [Elixir Circuits](https://github.com/elixir-circuits) |
-| ADC                  | No                               |
-| PWM                  | Yes, but no Elixir support       |
-| UART                 | 1 available - `ttyS0`            |
-| Display              | HDMI or 7" RPi Touchscreen       |
-| Camera               | Official RPi Cameras (libcamera) |
-| Ethernet             | Yes                              |
-| WiFi                 | Yes - VintageNet                 |
-| Bluetooth            | Untested                         |
-| Audio                | HDMI/Stereo out                  |
+## Hardware Features
+
+| Feature              | Description                     |
+| -------------------- | ------------------------------- |
+| CPU                  | Broadcom BCM2711 quad-core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz |
+| Memory               | Up to 8GB RAM                   |
+| Storage             | Up to 32GB eMMC, MicroSD card slot, M.2 NVMe SSD slot (2280-M Key) |
+| Linux kernel        | 6.1 w/ Raspberry Pi patches     |
+| IEx terminal        | HDMI and USB keyboard (can be disable) |
+| Ethernet            | 1x 10/100/1000Mbps (supports PoE*), 1x 10/100Mbps |
+| Serial              | 2x RS485 (isolated), 2x RS232 (isolated) |
+| Digital I/O         | 2x isolated DI ports (5~24V DC), 2x isolated DO ports (<60V DC) |
+| USB                 | 2x Type-A USB 2.0, 1x Type-C USB 2.0 (for OS updates) |
+| Display             | 1x HDMI 2.0                     |
+| Wireless           | On-chip Wi-Fi/BLE |
+| RTC                | PCF8563 Real-Time Clock with battery backup |
+| Security           | Encryption Chips: |
+|                    | - ATECC608A Crypto Authentication |
+|                    | - TPM 2.0 (TPM SLB9670) (Currently not supported) |
+| Power Input        | DC 9V~36V, PoE (IEEE 802.3af) support* |
+| Mounting           | DIN-rail and wall mounting compatible |
+| Expansion          | 2x Mini-PCIe slots supporting: (Currently not supported)   |
+|                    | - Slot 1: 4G, USB LoRa®, USB Zigbee |
+|                    | - Slot 2: SPI LoRa®, USB LoRa®, USB Zigbee |
+
+*PoE module needs to be installed separately
+
+## Industrial Features
+
+- Hardware watchdog
+- Optional UPS supercapacitor
+- Durable metal casing with PC side panels
+- EMC Standards:
+  - ESD: EN61000-4-2, Level 3
+  - EFT: EN61000-4-4, Level 2
+  - Surge Protection: EN61000-4-5, Level 2
+- Production lifetime until at least December 2030
 
 ## Using
 
-The most common way of using this Nerves System is create a project with `mix
-nerves.new` and to export `MIX_TARGET=rpi4`. See the [Getting started
+To use this Nerves System in your project, you need to add it as a dependency in your `mix.exs` file:
+
+```elixir
+def deps do
+  [
+    {:nerves_system_recomputer_r11xx, github: "alde/nerves_system_recomputer_r11xx", runtime: false, targets: :recomputer_r11xx}
+  ]
+end
+```
+
+Then, set your `MIX_TARGET=recomputer_r11xx` when building the firmware. See the [Getting started
 guide](https://hexdocs.pm/nerves/getting-started.html#creating-a-new-nerves-app)
 for more information.
 
@@ -40,41 +68,41 @@ systems](https://hexdocs.pm/nerves/customizing-systems.html).
 
 ## Supported WiFi devices
 
-The base image includes drivers for the onboard Raspberry Pi 4 wifi module
-(`brcmfmac` driver).
+The base image includes drivers for the onboard Wi-Fi module on R1100-10 models
+(`brcmfmac` driver). For other models, wireless connectivity can be added through
+the Mini-PCIe slots.
 
-## Camera
+## Ethernet Support
 
-This system supports the official Raspberry Pi camera modules via
-[`libcamera`](https://libcamera.org/). The `libcamera` applications are included so it's
-possible to replicate many of the examples in the official [Raspberry Pi Camera
-Documentation](https://www.raspberrypi.com/documentation/computers/camera_software.html).
+The system includes two Ethernet ports:
+- eth0: 10/100/1000Mbps Ethernet port with PoE capability (requires PoE module)
+- eth1: 10/100Mbps Ethernet port enabled through the SMSC95XX USB driver (CONFIG_USB_NET_SMSC95XX)
 
-Here's an example commandline to run:
+Both ports are configured for automatic link detection and speed negotiation by default.
+The secondary Ethernet port (eth1) is implemented using the USB SMSC95XX chipset, which
+is enabled in the kernel configuration.
 
-```elixir
-cmd("libcamera-jpeg -n -v -o /data/test.jpeg")
-```
+## Serial Support
 
-On success, you'll get an image in `/data` that you can copy off with `sftp`.
+The system includes four isolated serial ports implemented using the USB CDC ACM driver:
+- 2x RS485 ports:
+  - `/dev/ttyACM0`: RS485-1
+  - `/dev/ttyACM1`: RS485-2
+- 2x RS232 ports:
+  - `/dev/ttyACM2`: RS232-1
+  - `/dev/ttyACM3`: RS232-2
 
-Since `libcamera` is being used instead of MMAL, the Elixir
-[picam](https://hex.pm/packages/picam) library won't work.
+All serial ports are electrically isolated. The serial ports are implemented using the Linux `cdc_acm` driver, which provides standard
+serial port functionality through the USB interface.
 
-## Audio
+## Important Notes
 
-The Raspberry Pi has many options for audio output. This system supports the
-HDMI and stereo audio jack output. The Linux ALSA drivers are used for audio
-output.
-
-The general Raspberry Pi audio documentation mostly applies to Nerves. For
-example, to force audio out the HDMI port, run:
-
-```elixir
-cmd("amixer cset numid=3 2")
-```
-
-Change the last argument to `amixer` to `1` to output to the stereo output jack.
+- 4G and LoRa® modules cannot be used simultaneously
+- Only one LoRa® module can be installed at a time
+- PoE functionality requires separate module installation
+- SSD compatibility may vary; maximum speeds:
+  - Write: ~230MB/s
+  - Read: ~370MB/s
 
 ## Provisioning devices
 
