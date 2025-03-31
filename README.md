@@ -75,12 +75,28 @@ the Mini-PCIe slots.
 ## Ethernet Support
 
 The system includes two Ethernet ports:
-- eth0: 10/100/1000Mbps Ethernet port with PoE capability (requires PoE module)
+- eth0: 10/100/1000Mbps Ethernet port with PoE capability (can use PoE module)
 - eth1: 10/100Mbps Ethernet port enabled through the SMSC95XX USB driver (CONFIG_USB_NET_SMSC95XX)
 
 Both ports are configured for automatic link detection and speed negotiation by default.
 The secondary Ethernet port (eth1) is implemented using the USB SMSC95XX chipset, which
 is enabled in the kernel configuration.
+
+## GPIO Support
+
+The reComputer R11xx provides access to the following isolated digital I/O pins:
+
+| Hardware Label | GPIO Pin | Function |
+|----------------|----------|----------|
+| DI1            | GPIO18   | Digital Input (isolated, 5~24V DC) |
+| DI2            | GPIO19   | Digital Input (isolated, 5~24V DC) |
+| DO1            | GPIO20   | Digital Output (isolated, <60V DC) |
+| DO2            | GPIO21   | Digital Output (isolated, <60V DC) |
+
+The system includes a PCA953X GPIO extender that is already enabled in the Linux kernel.
+
+The onboard user LED (USR_LED) is exposed through the Linux LED subsystem and can be 
+controlled via the `/sys/class/leds` directory.
 
 ## Serial Support
 
@@ -164,4 +180,13 @@ take versions of the repositories that have similar commit times.
 The Linux kernel compiled for Nerves is a stripped down version of the default
 Raspberry Pi Linux kernel. This is done to remove unnecessary features, select
 some Nerves-specific features like F2FS and SquashFS support, and to save space.
+
+## TODOs
+
+- Implement drivers for 4G modules
+- Enable support for LoRa® modules
+- Configure interface for Zigbee modules
+- Test TPM 2.0 (OPTIGA™ TPM SLB9670)
+- Configure access to system EEPROM
+- Add support for power management and UPS supercapacitor
 
