@@ -68,7 +68,7 @@ defmodule NervesSystemRecomputerR11xx.MixProject do
   defp deps do
     [
       {:nerves, "~> 1.11", runtime: false},
-      {:nerves_system_br, "1.29.3", runtime: false},
+      {:nerves_system_br, "1.30.0", runtime: false},
       {:nerves_toolchain_aarch64_nerves_linux_gnu, "~> 13.2.0", runtime: false},
       {:nerves_system_linter, "~> 0.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.22", only: :docs, runtime: false}
@@ -93,8 +93,12 @@ defmodule NervesSystemRecomputerR11xx.MixProject do
   defp package do
     [
       files: package_files(),
-      licenses: ["Apache-2.0"],
-      links: %{"GitHub" => @source_url}
+      licenses: ["GPL-2.0-only", "GPL-2.0-or-later"],
+      links: %{
+        "GitHub" => @source_url,
+        "REUSE Compliance" =>
+          "https://api.reuse.software/info/github.com/nerves-project/nerves_system_rpi4"
+      }
     ]
   end
 
@@ -107,7 +111,7 @@ defmodule NervesSystemRecomputerR11xx.MixProject do
       "config.txt",
       "fwup-ops.conf",
       "fwup.conf",
-      "LICENSE",
+      "LICENSES/*",
       "linux-6.6.defconfig",
       "mix.exs",
       "nerves_defconfig",
@@ -115,6 +119,7 @@ defmodule NervesSystemRecomputerR11xx.MixProject do
       "post-createfs.sh",
       "ramoops.dts",
       "README.md",
+      "REUSE.toml",
       "VERSION"
     ]
   end
